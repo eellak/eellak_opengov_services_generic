@@ -6,6 +6,13 @@ include('../in/modules/helpers.php');
 include('functions.php');
 
 
+/*
+ * LEGEND:
+ * gen_dept: ΓΕΝΙΚΗ ΔΙΕΥΘΥΝΣΗ
+ * gd: ΓΕΝΙΚΗ/ΟΣ ΔΙΕΥΘΥΝΤΡΙΑ/ΗΣ
+ * type: ΚΑΤΗΓΟΡΙΑ ΣΤΕΛΕΧΟΥΣ: ΥΠΑΛΛΗΛΟΣ Η ΓΕΝΙΚΟΣ ΔΙΕΥΘΥΝΤΗΣ
+ */
+
 // Initialize the database handle
 $db = new PDOTester('mysql:host='. DB_HOST .';dbname=pdm_dev;charset=utf8', DB_USER, DB_PASS);
 
@@ -20,9 +27,10 @@ $query_wiki = $db->prepare("SELECT * FROM `wiki_hierarchy`");
 $query_wiki->execute();
 $wikiz = $query_wiki->fetchAll();	
 
-// This function is responsible for determining if there is already a mapping
-// between the given pdm department and a wiki department-cat and it returns
-// the retrieved data (id, pdm_id, wiki_id, type)
+//		-helper function-
+//		This function is responsible for determining if there is already a mapping
+//		between the given pdm department and a wiki department-cat and it returns
+//		the retrieved data (id, pdm_id, wiki_id, type)
 function mapper_exists($pdm_id){
 	global $db;
 
@@ -61,7 +69,11 @@ if(isset($_GET['dept_id']) and isset($_GET['wiki_id']) and isset($_GET['type_id'
 	}
 }
 
-// The function that prints the form to 
+//		-print module function-
+//		The function that prints the form to do the mapping between a given pdm_id
+//		and the list of the wiki departments.
+//		Accepts the pdm_id, the complete wiki hierarchy, the type (described on the legend)
+//		and the parent of the wiki node.
 function print_form($pdm_id, $wikiz, $type, $parent){
 ?>
 <!-- CAUTION: THE HANDLER IS HARDCODED. TO BE ALTERED FOR OTHER ORGANIZATIONS -->
@@ -81,6 +93,8 @@ function print_form($pdm_id, $wikiz, $type, $parent){
 <?php
 }
 
+// This function returns the wiki department that is assigned to the given pdm_id
+// RETURN VALUE: array(id, wiki_id, wiki_ns, wiki_parent, wiki_title)
 function print_wiki($pdm_id){
 	global $db;
 	$query = $db->prepare('SELECT * FROM `wiki_departments` where pdm_id=:pdm_id '  );
@@ -98,11 +112,17 @@ function print_wiki($pdm_id){
 
 $saved = array();
 
-foreach($structure as $gen_id){  
+
+//		THE PAGE MAIN BODY
+foreach($structure as $gen_id){
 	$gen_dept = get_gen_department($gen_id['unit_gd'] );
 	$wiki_id_now = 0;
 ?>
 
+	<!--		Prints the existing mappings between the  -->
+	
+	<!--		Prints a row with three cells: [genikos diefthintis], [geniki diefthinsi], [current wiki dept/list to choose] -->
+	<!--		genikos diefthintis mappings -->
 	<tr style="background: black; color: #ffffff;">
 		<td><strong><?php echo  $gen_dept['unit_gd']; ?></strong></td>
 		<td><strong><?php echo  $gen_dept['gen_department']; ?></strong></td>
@@ -118,6 +138,7 @@ foreach($structure as $gen_id){
 		</td>
 	</tr>
 <?php
+	//		Prints as many rows (tr's) for the DIEFTHINTES mapping 
 	$dief_dept_list = get_department($gen_dept['unit_gd']);
 	foreach($dief_dept_list as $dief_dept){
 		if(empty($dief_dept['unit_g'])) continue;

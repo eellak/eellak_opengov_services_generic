@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS `main_services_notes` (
 -- Table structure for table `wiki_departments`
 --
 
+-- Table acts as an intermediate table with the two
+-- foreign keys (pdm_id, wiki_id) and some extra info (type) per record.
 CREATE TABLE IF NOT EXISTS `wiki_departments` (
 `id` int(11) NOT NULL,
   `pdm_id` varchar(20) NOT NULL,
