@@ -5,11 +5,13 @@ include('../in/config.php');
 include('../in/modules/helpers.php');
 include('functions.php');
 
+
 // Initialize the database handle
 $db = new PDOTester('mysql:host='. DB_HOST .';dbname=pdm_dev;charset=utf8', DB_USER, DB_PASS);
 
 echo '<table border=1 cellpadding=3 width="100%"><thead></thead><tbody>';
  
+
 $query_dept = $db->prepare("SELECT distinct(unit_gd) FROM `main_departments`"); // where is main_departments??
 $query_dept->execute();
 $structure = $query_dept->fetchAll();
@@ -21,7 +23,6 @@ $wikiz = $query_wiki->fetchAll();
 // This function is responsible for determining if there is already a mapping
 // between the given pdm department and a wiki department-cat and it returns
 // the retrieved data (id, pdm_id, wiki_id, type)
-
 function mapper_exists($pdm_id){
 	global $db;
 
@@ -68,7 +69,7 @@ function print_form($pdm_id, $wikiz, $type, $parent){
 	<input type="hidden" name="dept_id" value="<?php echo $pdm_id; ?>" >
 	<input type="hidden" name="type_id" value="<?php echo $type; ?>" >
 	<select name="wiki_id">
-		<?php 
+		<?php
 			// Renders all the wiki parent items in a drop down list to make a choice for the mapping.
 			foreach($wikiz as $wiki){ if($wiki['wiki_parent'] != $parent) continue;
 				echo '<option value="'.$wiki['wiki_id'].'" >'.$wiki['wiki_title'].'</option>';
