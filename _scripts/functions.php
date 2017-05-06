@@ -1,10 +1,15 @@
 <?php
 	
+	//		helrper function that repla/ces either "κατηγορία" and "διεύθυνση" with the
+	//		given $text variable. so all the occurences of those literals will become
+	//		the given $text.
+	//		RETURN VALUE: the updated text.
 	function replacer($text){
 		$replacers  = array('Κατηγορία:', ' (Διεύθυνση)');
 		return str_replace($replacers ,'',$text);
 	}
 	
+	//		check to see if the wiki page with the given id exists in the wiki HIERARCHY table
 	function wiki_page_exists($page_id){
 		global $db;
 
@@ -12,13 +17,14 @@
 		
 		$query->bindValue(':wiki_id', 			$page_id, 			PDO::PARAM_INT);  
 		$query->execute();
-		$service = $query->fetchObject();	
+		$service = $query->fetchObject();
 		
 		if(empty($service)) return false;
 		
 		return true;
 	}
 	
+	//		check to see if the wiki page with the given id exists in the wiki SERVICES table
 	function wiki_service_exists($page_id){
 		global $db;
 
@@ -33,6 +39,8 @@
 		return true;
 	}
 	
+	//		check if the given item exists already, and save it as a wiki CATEGORY
+	//		RETURN VALUE: the id of the successfully saved wiki_cat, or else false.
 	function save_wiki_cat($item, $parent = 0){
 		
 		global $db;
@@ -58,7 +66,8 @@
 			return $id;
 	}
 	
-	
+	//		check if the given item exists already, and save it as a wiki SERVICE
+	//		RETURN VALUE: the id of the successfully saved wiki_cat, or else false.
 	function wiki_save_service($parent, $wiki_id, $title, $note = ''){
 		
 		global $db;
@@ -84,17 +93,21 @@
 			return true;
 	}
 	
-	
+	//		Retrieves the ΓΕΝΙΚΕΣ ΔΙΕΥΘΥΝΣΕΙΣ from the wiki_hierarchy table and...
+	//		RETURN VALUE: prints an html list with all the ΓΕΝΙΚΕΣ ΔΙΕΥΘΥΝΣΕΙΣ of the wiki
+	//		and for each of them the a list of the ΤΜΗΜΑΤΑ.
 	function get_gen_dief_from_wiki(){
 		global $print;
 		global $stats;
-
+		
+		//CAUTION: HARDCODED URL'S
 		$list = file_get_contents('https://diadikasies.gr/api.php?action=query&format=json&list=categorymembers&cmtitle=Κατηγορία:Υπηρεσίες_ανά_Γενική_Διεύθυνση_(περιφέρεια)&continue');
 		$list_items = json_decode($list, true);
 		
 		$print .= '<ul>';
 		foreach($list_items['query']['categorymembers'] as $item){
 			$stats['gendief'] = $stats['gendief'] + 1;
+			//CAUTION: HARDCODED URL'S
 			$print .= '<li><strong> ΓΔ: '.replacer($item['title']).' (<a href="https://diadikasies.gr/api.php?action=query&format=json&list=categorymembers&cmlimit=100&cmpageid='.$item['pageid'].'" target="_blank">'.$item['pageid'].'</a>)</strong><ul>';
 			get_children($item['pageid']);
 			$print .= '</ul></li>';
@@ -103,16 +116,19 @@
 		$print .= '</ul>';
 	}
 	
+	
 	function get_children($page_id){
 			global $print;
 			global $stats;
 		
+			//CAUTION: HARDCODED URL'S
 			$list = file_get_contents('https://diadikasies.gr/api.php?action=query&format=json&list=categorymembers&cmlimit=100&cmpageid='.$page_id);
 			$list_items = json_decode($list, true);
 			
 			foreach($list_items['query']['categorymembers'] as $item){
 				if(intval($item['ns']) == 14){ // Only Categories
 					$stats['dief'] = $stats['dief'] + 1;
+					//CAUTION: HARDCODED URL'S
 					$print .= '<li><strong> Δ : '.replacer($item['title']).' (<a href="https://diadikasies.gr/api.php?action=query&format=json&list=categorymembers&cmlimit=100&cmpageid='.$item['pageid'].'" target="_blank">'.$item['pageid'].'</a>)</strong><ul>';
 					$print .= get_tmima_details($item['pageid']);
 					$print .= '</ul></li>';
@@ -121,11 +137,13 @@
 			}
 	}
 	
+	//		get all the pages that belong to a certain category, so a ΓΕΝΙΚΗ ΔΙΕΥΘΥΝΣΗ
 	function get_tmima_details($page_id){
 		global $print;
 		global $stats;
 		global $all_services_dief;
 		
+		//CAUTION: HARDCODED URL'S
 		$list = file_get_contents('https://diadikasies.gr/api.php?action=query&format=json&list=categorymembers&cmlimit=100&cmpageid='.$page_id);
 		$list_items = json_decode($list, true);
 		
@@ -159,13 +177,17 @@
 			}
 		}
 
+		//		printing a
 		foreach($all_services_dief as $service_id=>$srv){
 		
 			$pos = strpos('Τμήμα', $srv);
 			if ($pos !== false) {
+				//		IS a TMIMA
 				$notice = ' [Tmima/String] -> '.$item['title'];
 				if(!in_array($notice, $stats['notices'])) $stats['notices'][] = $notice;
 			} else {
+				//		if not a TMIMA, then decide whether it needs a tmima or it has not been
+				//		inserted.
 				$stats['counter'] = $stats['counter'] + 1;
 				$stats['noncat'] = $stats['noncat'] + 1;
 				if(wiki_save_service($page_id, $service_id, $srv, 'needtmima'))
@@ -185,6 +207,7 @@
 		global $stats;
 		global $all_services_dief;
 		
+		//CAUTION: HARDCODED URL'S
 		$list = file_get_contents('https://diadikasies.gr/api.php?action=query&format=json&list=categorymembers&cmlimit=100&cmpageid='.$page_id);
 		$list_items = json_decode($list, true);
 				
