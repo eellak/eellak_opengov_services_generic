@@ -5,12 +5,18 @@
 		global $db, $user;
 	
 		// Get the Top Level
+		/*
+		 * params:
+		 * unit_g: 
+		 * 
+		 */
 		$query = $db->prepare('SELECT * FROM `wiki_departments` where pdm_id=:unit_g'  );
 			
 		$query->bindValue(':unit_g', 	$user->unit_g,				PDO::PARAM_STR); 	 
 		$query->execute();
 		$wiki_dept_id = $query->fetchObject();	
 		
+		//		Harvesting the id's of the top level to an array, naming them as 'parents'
 		$wiki_parents = array();
 		$wiki_parents[]= $wiki_dept_id->wiki_id;
 		
@@ -20,6 +26,8 @@
 		$query->execute();
 		$wiki_tmima_ids = $query->fetchAll();	
 		
+		//		Also harvesting the second level id's in the same array, thus creating an
+		//		array of all the inside nodes of the service hierarchy.
 		foreach($wiki_tmima_ids as $wiki_tmima_id) $wiki_parents[]= $wiki_tmima_id['wiki_id'];
 		
 		// Get the Services
@@ -30,6 +38,7 @@
 		return $services;
 	}
 	
+	//		Get the services a user can edit with the user's afm as a criterion.
 	function get_my_services(){
 		global $db, $user;
 
@@ -42,6 +51,8 @@
 		return $services;
 	}
 	
+	//		Get the services a user can edit with the user's wiki id services as a criterion.
+	//		The wiki_id refers to the wiki node the user can access.
 	function get_my_service($wiki_id){
 		global $db, $user;
 
@@ -54,6 +65,8 @@
 		return $service;
 	}
 	
+	//		Return a service instance where the wiki_id matches out of a service_list
+	//		that is parametrically given.
 	function get_service_values($wiki_id, $service_list){
 		foreach($service_list as $service){
 			if($service['wiki_id'] == $wiki_id){
@@ -63,6 +76,7 @@
 		return false;
 	}
 	
+	//		Gets user's notes from the database based on the user's afm.
 	function get_my_notes(){
 		global $db, $user;
 
@@ -75,7 +89,7 @@
 		return $notes;
 	}
 	
-
+	//		Returns a service instance given its wiki page id
 	function  get_service($wiki_id){
 		global $db, $user;
 
@@ -87,13 +101,14 @@
 		return $service;
 	}
 	
+	//		Returns the tmima name by its tmima_id
 	function find_tmima_name($tmimata, $tmima_id){
 		foreach($tmimata as $tmima){
 			if($tmima['unit_t'] == $tmima_id) return $tmima['office'];
 		}
 	}
 	
-
+	//		Save service routine, 
 	function save_new_services(){
 		global $db;
 		global $user;
@@ -111,6 +126,8 @@
 				if(in_array($key, $exclude)) continue;
 				$key_parts = explode('-', $key);
 				if(count($key_parts) > 1)
+					
+					//		Filling an array of type([new_service_dept][new_service_title])
 					$items_to_process[$key_parts[1]][$key_parts[0]] = $value;
 			}
 			
@@ -232,6 +249,7 @@
 		}
 	}
 	
+	//		Retrieves the tmimata that the user may belong to.
 	function get_user_tmima(){
 		global $db, $user;
 

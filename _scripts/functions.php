@@ -1,6 +1,6 @@
 <?php
 	
-	//		helrper function that repla/ces either "κατηγορία" and "διεύθυνση" with the
+	//		helper function that replaces either "κατηγορία" and "διεύθυνση" with the
 	//		given $text variable. so all the occurences of those literals will become
 	//		the given $text.
 	//		RETURN VALUE: the updated text.
