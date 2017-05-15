@@ -108,7 +108,8 @@
 		}
 	}
 	
-	//		Save service routine, 
+	//		Save new services the user has entered in the add services form in home.php
+	//		Actually, is the form handler for form name="serviceform"
 	function save_new_services(){
 		global $db;
 		global $user;

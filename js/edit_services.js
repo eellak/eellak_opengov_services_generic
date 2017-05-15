@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	
+	// The snippets are responsible for adding the 'αλλαγη ονομασιας' functionality
 	$("input[type='radio']").change(function(){ 
 		//console.log($(this).val());
 		if($(this).val() != 1){

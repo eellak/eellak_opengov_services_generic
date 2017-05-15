@@ -8,6 +8,7 @@
 		$side_menu = array( 
 			array('url' => URL.'/?p=services|home', 			'class' => 'fa fa-home fa-fw', 					'text' => 'Επικαιροποίηση Υπηρεσιών'),
 			array('url' => URL.'/?p=services|set', 				'class' => 'fa fa-bar-chart-o fa-fw', 			'text' => 'Προτεραιοποίηση/Επιλογές'),
+			array('url' => URL.'/?p=services|map',				'class' => 'fa fa-exchange-o fa-fw',				'text' => 'Αντιστοιχιση Αρμοδιοτητων'),
 		);
 		
 	}
