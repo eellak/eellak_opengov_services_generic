@@ -13,13 +13,15 @@
 		
 	}
 	
+	//		Gets the querystring and redirects to the page that the route indicates
+	//		Loads the appropriate css and js files for each route.
 	function prepare_pages(){
 		global $css_files;
 		global $js_files;
 		global $application_list;
 		
 		$page = '';
-		$params = explode('|', trim($_GET['p'])); //Έλεγχος ορισμάτων URL
+		$params = explode('|', trim($_GET['p'])); //Έλεγχος ορισμάτων URL, keeps the page name that comes after the '|' character.
 		if(array_key_exists($params[0], $application_list)){	
 			if(empty($params[1]) or $params[1] == '')
 				$page = 'home';
@@ -37,6 +39,9 @@
 				break;
 			case 'set':			
 				$js_files[] =  array('head' => false, 'path' => 'apps/services/js/set_services.js');
+				break;
+			case 'map':
+				$js_files[] =  array('head' => false, 'path' => 'apps/services/js/map_services.js');
 				break;
 		}
 		
